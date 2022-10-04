@@ -5,6 +5,7 @@ const { pluginConfigSchema } = require('./schema');
 module.exports = {
 	default() {
 		return {
+			redisOptions: {},
 			IOServerOptions: {},
 			contentTypes: {},
 			events: [],

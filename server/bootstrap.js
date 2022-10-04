@@ -16,7 +16,7 @@ module.exports = async ({ strapi }) => {
 
 	// setup io
 	// initialize
-	strapi.$io = new IO(normalizedSettings.IOServerOptions);
+	strapi.$io = new IO(normalizedSettings.IOServerOptions, normalizedSettings.redisOptions);
 
 	// add io middleware
 	IOMiddleware({ strapi });

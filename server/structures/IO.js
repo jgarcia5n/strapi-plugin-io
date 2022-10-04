@@ -1,15 +1,22 @@
 'use strict';
 
 const { Server } = require('socket.io');
+const { createAdapter }  = require('@socket.io/redis-adapter');
+const { createClient } = require('redis');
 const { handshake } = require('../middlewares/handshake');
 const { buildEventName } = require('../utils/buildEventName');
 const { getModelMeta } = require('../utils/getModelMeta');
 const { getStrapiRooms } = require('../utils/getStrapiRooms');
 
 class IO {
-	constructor(options) {
+	constructor(options, redisOptions) {
 		this._socket = new Server(strapi.server.httpServer, options);
 		this._socket.use(handshake);
+		this._pubClient = createClient(redisOptions);
+		this._subClient = this._pubClient.duplicate();
+		Promise.all([this._pubClient.connect(), this._subClient.connect()]).then(() => {
+			this._socket.adapter(createAdapter(this._pubClient, this._subClient));
+		})
 	}
 
 	/**
