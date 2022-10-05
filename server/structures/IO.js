@@ -12,11 +12,13 @@ class IO {
 	constructor(options, redisOptions) {
 		this._socket = new Server(strapi.server.httpServer, options);
 		this._socket.use(handshake);
-		this._pubClient = createClient(redisOptions);
-		this._subClient = this._pubClient.duplicate();
-		Promise.all([this._pubClient.connect(), this._subClient.connect()]).then(() => {
-			this._socket.adapter(createAdapter(this._pubClient, this._subClient));
-		})
+		if (redisOptions.enabled) {
+			this._pubClient = createClient(redisOptions);
+			this._subClient = this._pubClient.duplicate();
+			Promise.all([this._pubClient.connect(), this._subClient.connect()]).then(() => {
+				this._socket.adapter(createAdapter(this._pubClient, this._subClient));
+			});
+		}
 	}
 
 	/**
